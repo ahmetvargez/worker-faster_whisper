@@ -1,7 +1,7 @@
 from faster_whisper.utils import download_model
 
 # Only download medium model to save storage and ensure it's cached
-model_name = "medium"
+model_name = "medium.en"
 
 
 def download_model_weights(selected_model):

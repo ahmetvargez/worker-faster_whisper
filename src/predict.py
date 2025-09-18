@@ -25,7 +25,7 @@ except ImportError:
     TORCH_AVAILABLE = False
 
 AVAILABLE_MODELS = {
-    "medium",
+    "medium.en",
 }
 
 
@@ -38,8 +38,8 @@ class Predictor:
         self.model_lock = threading.Lock()  # Lock for thread-safe model access
 
     def setup(self):
-        """Pre-load medium model to avoid loading delays and memory issues."""
-        print("Loading medium model during setup...")
+        """Pre-load medium.en model to avoid loading delays and memory issues."""
+        print("Loading medium.en model during setup...")
 
         # Clear CUDA cache before loading model to maximize available memory
         if rp_cuda.is_available():
@@ -50,21 +50,23 @@ class Predictor:
 
         try:
             self.model = WhisperModel(
-                "medium",
+                "medium.en",
                 device="cuda" if rp_cuda.is_available() else "cpu",
                 compute_type="float16" if rp_cuda.is_available() else "int8",
                 # Optimize memory usage
                 cpu_threads=4 if not rp_cuda.is_available() else 0,
             )
-            print("medium model loaded successfully and cached.")
+            print("medium.en model loaded successfully and cached.")
         except Exception as e:
-            print(f"Error loading medium model during setup: {e}")
+            print(f"Error loading medium.en model during setup: {e}")
             # Try to clear memory and provide helpful error message
             if rp_cuda.is_available():
                 gc.collect()
                 if TORCH_AVAILABLE:
                     torch.cuda.empty_cache()
-            raise RuntimeError(f"Failed to load medium model during setup: {e}") from e
+            raise RuntimeError(
+                f"Failed to load medium.en model during setup: {e}"
+            ) from e
 
     def predict(
         self,
