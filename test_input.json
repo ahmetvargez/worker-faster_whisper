@@ -1,7 +1,7 @@
 {
   "input": {
     "audio": "https://github.com/runpod-workers/sample-inputs/raw/main/audio/gettysburg.wav",
-    "model": "large-v2",
+    "model": "medium",
     "transcription": "plain text",
     "translate": false,
     "temperature": 0,

@@ -19,13 +19,13 @@ from faster_whisper.utils import format_timestamp
 # Import torch for CUDA memory management
 try:
     import torch
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
 
-# Only large-v2 model is available to avoid memory issues
 AVAILABLE_MODELS = {
-    "large-v2",
+    "medium",
 }
 
 
@@ -35,38 +35,36 @@ class Predictor:
     def __init__(self):
         """Initializes the predictor with no models loaded."""
         self.model = None
-        self.model_lock = (
-            threading.Lock()
-        )  # Lock for thread-safe model access
+        self.model_lock = threading.Lock()  # Lock for thread-safe model access
 
     def setup(self):
-        """Pre-load large-v2 model to avoid loading delays and memory issues."""
-        print("Loading large-v2 model during setup...")
-        
+        """Pre-load medium model to avoid loading delays and memory issues."""
+        print("Loading medium model during setup...")
+
         # Clear CUDA cache before loading model to maximize available memory
         if rp_cuda.is_available():
             gc.collect()
             if TORCH_AVAILABLE:
                 torch.cuda.empty_cache()
                 print("Cleared CUDA cache before model loading")
-        
+
         try:
             self.model = WhisperModel(
-                "large-v2",
+                "medium",
                 device="cuda" if rp_cuda.is_available() else "cpu",
                 compute_type="float16" if rp_cuda.is_available() else "int8",
                 # Optimize memory usage
                 cpu_threads=4 if not rp_cuda.is_available() else 0,
             )
-            print("large-v2 model loaded successfully and cached.")
+            print("medium model loaded successfully and cached.")
         except Exception as e:
-            print(f"Error loading large-v2 model during setup: {e}")
+            print(f"Error loading medium model during setup: {e}")
             # Try to clear memory and provide helpful error message
             if rp_cuda.is_available():
                 gc.collect()
                 if TORCH_AVAILABLE:
                     torch.cuda.empty_cache()
-            raise RuntimeError(f"Failed to load large-v2 model during setup: {e}") from e
+            raise RuntimeError(f"Failed to load medium model during setup: {e}") from e
 
     def predict(
         self,
@@ -100,10 +98,12 @@ class Predictor:
                 f"Invalid model name: {model_name}. Available models are: {AVAILABLE_MODELS}"
             )
 
-        # Use the pre-loaded model (always large-v2)
+        # Use the pre-loaded model (always medium)
         with self.model_lock:
             if self.model is None:
-                raise RuntimeError("Model not loaded. Ensure setup() was called successfully.")
+                raise RuntimeError(
+                    "Model not loaded. Ensure setup() was called successfully."
+                )
             model = self.model
             print(f"Using cached model: {model_name}")
 
