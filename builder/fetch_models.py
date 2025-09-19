@@ -1,4 +1,7 @@
-from huggingface_hub import snapshot_download
+from faster_whisper.utils import download_model
+
+# Only download medium.en model to save storage and ensure it's cached
+model_name = "medium.en"
 
 
 def download_model_weights(selected_model):
@@ -6,9 +9,10 @@ def download_model_weights(selected_model):
     Download model weights.
     """
     print(f"Downloading {selected_model}...")
-    # model ID from the URL
-    model_id = "Systran/faster-whisper-medium.en"
-    # this will download the model to the cache dir (by default ~/.cache/huggingface)
-    local_dir = snapshot_download(repo_id=model_id)
+    download_model(selected_model, cache_dir=None)
+    print(f"Finished downloading {selected_model}.")
 
-    print(f"Model downloaded to: {local_dir}")
+
+# Download only medium.en
+download_model_weights(model_name)
+print(f"Finished downloading {model_name}.")
